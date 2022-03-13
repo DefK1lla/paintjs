@@ -5,10 +5,14 @@ const canvas = document.getElementById('jsCanvas'),
     ctx = canvas.getContext('2d'),
     colors = document.getElementsByClassName('jsColor'),
     range = document.getElementById('jsRange'),
-    mode = document.getElementById('jsMode');
+    modeBtn = document.getElementById('jsMode'),
+    saveBtn = document.getElementById('jsSave');
 
 canvas.height = CANVAS_SIZE;
 canvas.width = CANVAS_SIZE;
+
+ctx.fillStyle = 'white';
+ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
 ctx.lineWidth = 2.5;
 ctx.strokeStyle = INITIAL_COLOR;
@@ -48,7 +52,6 @@ function handleCanvasClick(event) {
     }
 }
 
-
 function handleColorClick(event) {
     let color = event.target.style.backgroundColor;
     ctx.strokeStyle = color;
@@ -69,12 +72,22 @@ function handleModeClick(event) {
     }
 }
 
+function handleSaveClick(event) {
+    let image = canvas.toDataURL(),
+        link = document.createElement('a');
+
+    link.href = image;
+    link.download = 'Безымянный';
+    link.click();
+}
+
 if (canvas) {
     canvas.addEventListener('mousemove', onMouseMove);
     canvas.addEventListener('mouseleave', stopPainting);
     canvas.addEventListener('mousedown', onMouseDown);
     canvas.addEventListener('mouseup', stopPainting);
     canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 }
 
 Array.from(colors).forEach(color => color.addEventListener('click', handleColorClick));
@@ -83,6 +96,10 @@ if (range) {
     range.addEventListener('input', handleRangeChange);
 }
 
-if (mode) {
-    mode.addEventListener('click', handleModeClick)
+if (modeBtn) {
+    modeBtn.addEventListener('click', handleModeClick)
+}
+
+if (saveBtn) {
+    saveBtn.addEventListener('click', handleSaveClick);
 }

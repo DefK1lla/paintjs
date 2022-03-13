@@ -1,15 +1,21 @@
+const INITIAL_COLOR = '#2c2c2c',
+    CANVAS_SIZE = 700;
+
 const canvas = document.getElementById('jsCanvas'),
     ctx = canvas.getContext('2d'),
     colors = document.getElementsByClassName('jsColor'),
-    range = document.getElementById('jsRange');
+    range = document.getElementById('jsRange'),
+    mode = document.getElementById('jsMode');
 
-canvas.height = 700;
-canvas.width = 700;
+canvas.height = CANVAS_SIZE;
+canvas.width = CANVAS_SIZE;
 
 ctx.lineWidth = 2.5;
-ctx.strokeStyle = '#2c2c2c';
+ctx.strokeStyle = INITIAL_COLOR;
+ctx.fillStyle = INITIAL_COLOR;
 
-let painting = false;
+let painting = false,
+    filling = false;
 
 function stopPainting() {
     painting = false;
@@ -23,12 +29,12 @@ function onMouseMove(event) {
     x = event.offsetX;
     y = event.offsetY;
 
-    if (!painting) {
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    } else {
+    if (painting && !filling) {
         ctx.lineTo(x, y);
         ctx.stroke();
+    } else {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
     }
 }
 
@@ -36,13 +42,31 @@ function onMouseDown(event) {
     painting = true;
 }
 
+function handleCanvasClick(event) {
+    if (filling) {
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    }
+}
+
 
 function handleColorClick(event) {
-    ctx.strokeStyle = event.target.style.backgroundColor;
+    let color = event.target.style.backgroundColor;
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
 }
 
 function handleRangeChange(event) {
     ctx.lineWidth = event.target.value;
+}
+
+function handleModeClick(event) {
+    if (filling) {
+        filling = false;
+        event.target.textContent = 'Заливка';
+    } else {
+        filling = true;
+        event.target.textContent = 'Рисование';
+    }
 }
 
 if (canvas) {
@@ -50,10 +74,15 @@ if (canvas) {
     canvas.addEventListener('mouseleave', stopPainting);
     canvas.addEventListener('mousedown', onMouseDown);
     canvas.addEventListener('mouseup', stopPainting);
+    canvas.addEventListener('click', handleCanvasClick);
 }
 
 Array.from(colors).forEach(color => color.addEventListener('click', handleColorClick));
 
 if (range) {
     range.addEventListener('input', handleRangeChange);
+}
+
+if (mode) {
+    mode.addEventListener('click', handleModeClick)
 }
